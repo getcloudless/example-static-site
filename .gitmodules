@@ -1,0 +1,3 @@
+[submodule "example-consul"]
+	path = example-consul
+	url = https://github.com/getcloudless/example-consul

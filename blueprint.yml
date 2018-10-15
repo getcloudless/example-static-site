@@ -19,8 +19,10 @@ image:
   name: "cloudless-example-base-image-v0"
 
 initialization:
-  - path: "apache_startup_script.sh"
+  - path: "static_site_startup_script.sh"
     vars:
+      consul_ips:
+        required: true
       cloudless_test_framework_ssh_key:
         required: false
       cloudless_test_framework_ssh_username:

@@ -8,9 +8,13 @@ echo "{{ cloudless_test_framework_ssh_key }}" >> /home/{{ cloudless_test_framewo
 {% endif %}
 
 apt-get update
-apt-get install -y apache2
-cat <<EOF > /var/www/html/index.html
-<html><body><h1>Hello World</h1>
-<p>This page was created from a simple startup script!</p>
-</body></html>
+apt-get install -y python3-pip
+pip3 install python-consul
+cat <<EOF > /tmp/fetch_key.py
+import consul
+consul_client = consul.Consul("{{ consul_ips[0] }}")
+dummy_api_key = consul_client.kv.get('dummy_api_key')
+print(dummy_api_key[1]["Value"].decode("utf-8").strip())
 EOF
+
+python3 /tmp/fetch_key.py >> /tmp/dummy_key.txt
