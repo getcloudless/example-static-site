@@ -12,7 +12,7 @@ from cloudless.types.networking import CidrBlock
 SERVICE_BLUEPRINT = os.path.join(os.path.dirname(__file__), "example-consul/blueprint.yml")
 
 RETRY_DELAY = float(10.0)
-RETRY_COUNT = int(6)
+RETRY_COUNT = int(60)
 
 class BlueprintTest(BlueprintTestInterface):
     """
