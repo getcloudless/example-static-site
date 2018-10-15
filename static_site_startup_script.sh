@@ -18,3 +18,10 @@ print(dummy_api_key[1]["Value"].decode("utf-8").strip())
 EOF
 
 python3 /tmp/fetch_key.py >> /tmp/dummy_key.txt
+
+apt-get install -y nginx git ruby-dev build-essential zlib1g-dev
+git clone "{{ jekyll_site_github_url }}"
+gem install bundler
+cd getcloudless.com/
+bundle install
+bundle exec jekyll build --destination /var/www/html

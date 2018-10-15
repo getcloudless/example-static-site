@@ -46,7 +46,8 @@ class BlueprintTest(BlueprintTestInterface):
 
         return SetupInfo(
             {"service_name": service_name},
-            {"consul_ips": [i.private_ip for s in service.subnetworks for i in s.instances]})
+            {"consul_ips": [i.private_ip for s in service.subnetworks for i in s.instances],
+             "jekyll_site_github_url": "https://github.com/getcloudless/getcloudless.com.git"})
 
     def setup_after_tested_service(self, network, service, setup_info):
         """
@@ -71,7 +72,7 @@ class BlueprintTest(BlueprintTestInterface):
             assert public_ips
             for public_ip in public_ips:
                 response = requests.get("http://%s" % public_ip)
-                expected_content = "Hello World"
+                expected_content = "Cloudless"
                 assert response.content, "No content in response"
                 assert expected_content in str(response.content), (
                     "Unexpected content in response: %s" % response.content)

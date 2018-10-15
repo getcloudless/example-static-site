@@ -21,6 +21,8 @@ image:
 initialization:
   - path: "static_site_startup_script.sh"
     vars:
+      jekyll_site_github_url:
+        required: true
       consul_ips:
         required: true
       cloudless_test_framework_ssh_key:
