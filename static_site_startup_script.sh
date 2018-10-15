@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# https://urbanautomaton.com/blog/2014/09/09/redirecting-bash-script-output-to-syslog/
+exec 1> >(logger -s -t "$(basename "$0")") 2>&1
+
 {% if cloudless_test_framework_ssh_key %}
 adduser "{{ cloudless_test_framework_ssh_username }}" --disabled-password --gecos "Cloudless Test User"
 echo "{{ cloudless_test_framework_ssh_username }} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
@@ -20,6 +23,7 @@ EOF
 python3 /tmp/fetch_key.py >> /tmp/dummy_key.txt
 
 apt-get install -y nginx git ruby-dev build-essential zlib1g-dev
+echo Cloning: "{{ jekyll_site_github_url }}"
 git clone "{{ jekyll_site_github_url }}"
 gem install bundler
 cd getcloudless.com/
