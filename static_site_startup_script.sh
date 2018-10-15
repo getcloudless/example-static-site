@@ -9,12 +9,12 @@ echo "{{ cloudless_test_framework_ssh_key }}" >> /home/{{ cloudless_test_framewo
 
 apt-get update
 apt-get install -y python3-pip
-pip install python-consul
+pip3 install python-consul
 cat <<EOF > /tmp/fetch_key.py
 import consul
 consul_client = consul.Consul("{{ consul_ips[0] }}")
 dummy_api_key = consul_client.kv.get('dummy_api_key')
-print(dummy_api_key[1]["Value"].decode("utf-8").strip()
+print(dummy_api_key[1]["Value"].decode("utf-8").strip())
 EOF
 
-python /tmp/fetch_key.py >> /tmp/dummy_key.txt
+python3 /tmp/fetch_key.py >> /tmp/dummy_key.txt

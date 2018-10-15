@@ -4,10 +4,10 @@ Static Site Test Fixture
 import os
 from retrying import retry
 import requests
+import consul
 from cloudless.testutils.blueprint_tester import call_with_retries
 from cloudless.testutils.fixture import BlueprintTestInterface, SetupInfo
 from cloudless.types.networking import CidrBlock
-import consul
 
 SERVICE_BLUEPRINT = os.path.join(os.path.dirname(__file__), "example-consul/blueprint.yml")
 
@@ -32,7 +32,7 @@ class BlueprintTest(BlueprintTestInterface):
             assert public_ips, "No services are running..."
             for public_ip in public_ips:
                 consul_client = consul.Consul(public_ip)
-                if consul_client.kv.get('dummy_api_key'):
+                if consul_client.kv.get('dummy_api_key')[1]:
                     continue
                 consul_client.kv.put('dummy_api_key', 'dummy_api_key_value')
             return True
