@@ -1,2 +1,12 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+
 [packages]
-cloudless = {git = "https://github.com/sverch/cloudless", ref = "master", editable = true}
+cloudless = "*"
+
+[requires]
+python_version = "3.6"
