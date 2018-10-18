@@ -41,6 +41,15 @@ apt-get update
 apt-get install -y sslmate
 mkdir -p /etc/sslmate
 
+# Install Datadog Agent
+{% if use_datadog %}
+apt-get install -y apt-transport-https
+sh -c "echo 'deb https://apt.datadoghq.com/ stable 6' > /etc/apt/sources.list.d/datadog.list"
+apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 382E94DE
+apt-get update
+apt-get install -y datadog-agent
+{% endif %}
+
 # DYNAMIC SECTION: This section has all the blocks that take template variables
 # or should probably happen at runtime.  This could be done by having
 # configuration scripts built into the image (for example, a "configure nginx"
@@ -130,6 +139,31 @@ python3 /tmp/fetch_key.py "{{ jekyll_site_domain }}.key" >> "/etc/sslmate/{{ jek
 # Install certificate download as a cron job
 # (https://stackoverflow.com/a/16068840)
 (crontab -l ; echo "0 1 * * * /opt/sslmate_download.sh") | crontab -
+{% endif %}
+
+# Run Datadog Agent And Configure Nginx Integration https://docs.datadoghq.com/integrations/nginx/
+{% if use_datadog %}
+sh -c "sed \"s/api_key:.*/api_key: $(python3 /tmp/fetch_key.py DATADOG_API_KEY)/\" /etc/datadog-agent/datadog.yaml.example > /etc/datadog-agent/datadog.yaml"
+cat <<EOF >| /etc/nginx/conf.d/status.conf
+server {
+  listen 81;
+  server_name localhost;
+
+  access_log off;
+  allow 127.0.0.1;
+  deny all;
+
+  location /nginx_status {
+    stub_status;
+  }
+}
+EOF
+cat <<EOF >| /etc/datadog-agent/conf.d/nginx.d/conf.yaml
+init_config:
+instances:
+  - nginx_status_url: http://localhost:81/nginx_status/
+EOF
+systemctl start datadog-agent
 {% endif %}
 
 # Restart nginx

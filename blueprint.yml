@@ -29,6 +29,8 @@ initialization:
         required: true
       use_sslmate:
         required: false
+      use_datadog:
+        required: false
       cloudless_test_framework_ssh_key:
         required: false
       cloudless_test_framework_ssh_username:

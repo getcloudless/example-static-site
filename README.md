@@ -48,6 +48,20 @@ file, and then set `SSLMATE_API_KEY`, `SSLMATE_API_ENDPOINT`, and
 `{your_domain}.key` to the proper values on the Consul server that you provide
 in `consul_ips`.
 
+## DataDog Monitoring
+
+This module uses [datadog](https://www.datadoghq.com/) for monitoring.
+
+If you want the regression test to test for this, you need to set
+`DATADOG_API_KEY` and `DATADOG_APP_KEY` to the proper values. The
+`DATADOG_API_KEY` is the same one use use for the agent while the
+`DATADOG_APP_KEY` identifies the client (the machine running Cloudless) that's
+querying the DataDog API to test whether the service is logging.
+
+If you want to set up monitoring, you need to set `use_datadog` to true in your
+`vars.yml` file, and then set `DATADOG_API_KEY` and `DATADOG_APP_KEY` to the
+proper values on the Consul server that you provide in `consul_ips`.
+
 ## Development
 
 The main value of the test framework is that it is focused on the workflow of
