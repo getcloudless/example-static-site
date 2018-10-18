@@ -32,7 +32,7 @@ class BlueprintTest(BlueprintTestInterface):
         use_sslmate = 'SSLMATE_API_KEY' in os.environ
         use_datadog = 'DATADOG_API_KEY' in os.environ
 
-        @retry(wait_fixed=5000, stop_max_attempt_number=24)
+        @retry(wait_fixed=10000, stop_max_attempt_number=24)
         def add_api_keys(service):
             public_ips = [i.public_ip for s in service.subnetworks for i in s.instances]
             assert public_ips, "No services are running..."
