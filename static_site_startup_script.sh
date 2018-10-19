@@ -163,6 +163,14 @@ init_config:
 instances:
   - nginx_status_url: http://localhost:81/nginx_status/
 EOF
+cat <<EOF >| /etc/datadog-agent/conf.d/consul.d/conf.yaml
+init_config:
+instances:
+  - url: http://{{ consul_ips[0] }}:8500
+    catalog_checks: true
+    self_leader_check: true
+    network_latency_checks: true
+EOF
 systemctl start datadog-agent
 {% endif %}
 

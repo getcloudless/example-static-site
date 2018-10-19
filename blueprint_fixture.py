@@ -151,3 +151,15 @@ class BlueprintTest(BlueprintTestInterface):
                 del datapoint['pointlist']
             assert False, "No nginx stats in datadog metrics for this service!  %s" % series
         call_with_retries(is_agent_sending_nginx_metrics, RETRY_COUNT, RETRY_DELAY)
+
+        def is_agent_sending_consul_metrics():
+            now = int(time.time())
+            query = 'consul.catalog.total_nodes{*}by{host}'
+            series = api.Metric.query(start=now - 600, end=now, query=query)
+            for datapoint in series['series']:
+                if re.match(".*%s.*%s.*" % (network.name, service.name), datapoint['expression']):
+                    return
+                # Delete this because we don't care about it here and it muddies the error message
+                del datapoint['pointlist']
+            assert False, "No consul stats in datadog metrics for this service!  %s" % series
+        call_with_retries(is_agent_sending_consul_metrics, RETRY_COUNT, RETRY_DELAY)
