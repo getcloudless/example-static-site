@@ -77,9 +77,11 @@ class BlueprintTest(BlueprintTestInterface):
         consul_service = self.client.service.get(network, consul_service_name)
         my_ip = requests.get("http://ipinfo.io/ip")
         test_machine = CidrBlock(my_ip.content.decode("utf-8").strip())
-        self.client.paths.add(service, consul_service, 8500)
         self.client.paths.add(test_machine, service, 80)
         self.client.paths.add(test_machine, service, 443)
+        # Add this last because we want to make sure that our service can handle a delay before
+        # getting connectivity to consul.
+        self.client.paths.add(service, consul_service, 8500)
 
     def verify(self, network, service, setup_info):
         """

@@ -4,10 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [dev-packages]
+pylint = "*"
 
 [packages]
 cloudless = "*"
 python-consul = "*"
+datadog = "*"
 
 [requires]
 python_version = "3.6"
