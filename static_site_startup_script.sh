@@ -26,12 +26,39 @@ gem install bundler
 # Install Python Script to Pull from Consul
 apt-get install -y python3-pip
 pip3 install python-consul
+# These should eventually be their own agents that live in separate projects.
+# Think "datadog sidecar" that can pull secrets from Consul, Vault, S3 or other
+# places.
 cat <<EOF > /tmp/fetch_key.py
 import sys
 import consul
 consul_client = consul.Consul("{{ consul_ips[0] }}")
 dummy_api_key = consul_client.kv.get(sys.argv[1])
 print(dummy_api_key[1]["Value"].decode("utf-8").strip())
+EOF
+cat <<EOF > /tmp/wait_for_consul.py
+import time
+import sys
+import consul
+import socket
+
+if len(sys.argv) < 3:
+    print("Usage: %s <retries> <delay (seconds)>" % sys.argv[0])
+    sys.exit(1)
+
+for i in range(0, int(sys.argv[1]) + 1):
+    try:
+        # Try to open a TCP connection with a short timeout, since the consul
+        # client doesn't actually pass a timeout and will just hang even when we
+        # get connectivity.
+        conn = socket.create_connection(("{{ consul_ips[0] }}", 8500), 1)
+        consul_client = consul.Consul("{{ consul_ips[0] }}")
+        consul_client.kv.get("nonexistent_key")
+        break
+    except Exception as exception:
+        print("Exception connecting to Consul: %s" % exception)
+        print("Retry number: %s of %s" % (i, sys.argv[1]))
+        time.sleep(float(sys.argv[2]))
 EOF
 
 # Install sslmate (https://sslmate.com/help/cmdline/install)
@@ -122,6 +149,9 @@ git clone "{{ jekyll_site_github_url }}"
 cd getcloudless.com/ || exit
 bundle install
 bundle exec jekyll build --destination /var/www/html
+
+# Wait for consul connectivity before continuing
+python3 /tmp/wait_for_consul.py 60 10
 
 {% if use_sslmate %}
 # Configure sslmate
