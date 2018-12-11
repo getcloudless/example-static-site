@@ -43,10 +43,14 @@ If you want the regression test to use SSL, you need to set `SSLMATE_API_KEY`,
 It's recommended that you use the [sslmate
 sandbox](https://sslmate.com/help/sandbox) for this.
 
-If you want to use SSL, you need to set `use_sslmate` to true in your `vars.yml`
-file, and then set `SSLMATE_API_KEY`, `SSLMATE_API_ENDPOINT`, and
-`{your_domain}.key` to the proper values on the Consul server that you provide
-in `consul_ips`.
+By default, the tests assume the certificate is for `getcloudless.com` (which
+you can get by using the SSLMate sandbox).  If you want to test that your domain
+works, set the `STATIC_SITE_TEST_DOMAIN` environment variable.
+
+If you want to use SSL when you deploy, you need to set `use_sslmate` to true in
+your `vars.yml` file, and then set `SSLMATE_API_KEY`, `SSLMATE_API_ENDPOINT`,
+and `{your_domain}.key` to the proper values on the Consul server that you
+provide in `consul_ips`.
 
 ## DataDog Monitoring
 

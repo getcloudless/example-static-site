@@ -30,19 +30,27 @@ class BlueprintTest(BlueprintTestInterface):
         use_datadog = 'DATADOG_API_KEY' in os.environ
         check_environment(use_sslmate=use_sslmate, use_datadog=use_datadog)
 
+        # Get our domain name
+        # Unfortunately we have to do this manually because Cloudless doesn't have a native way to
+        # configure parameters.  See https://github.com/getcloudless/cloudless/issues/78
+        # We also can't do a random domain, because generating the certificate is done out of band.
+        if 'STATIC_SITE_TEST_DOMAIN' in os.environ:
+            domain_name = os.environ['STATIC_SITE_TEST_DOMAIN']
+        else:
+            domain_name = "getcloudless.com"
+
         # Now let's add any necessary API keys to Consul.
         my_ip = requests.get("http://ipinfo.io/ip")
         test_machine = CidrBlock(my_ip.content.decode("utf-8").strip())
         self.client.paths.add(test_machine, service, 8500)
         consul_ips = [i.public_ip for s in service.subnetworks for i in s.instances]
-        setup_consul(consul_ips, "getcloudless.com", use_sslmate=use_sslmate,
-                     use_datadog=use_datadog)
+        setup_consul(consul_ips, domain_name, use_sslmate=use_sslmate, use_datadog=use_datadog)
         self.client.paths.remove(test_machine, service, 8500)
 
         blueprint_variables = {
             "consul_ips": [i.private_ip for s in service.subnetworks for i in s.instances],
             "jekyll_site_github_url": "https://github.com/getcloudless/getcloudless.com.git",
-            "jekyll_site_domain": "getcloudless.com"}
+            "jekyll_site_domain": domain_name}
 
         if use_sslmate:
             blueprint_variables["use_sslmate"] = True
