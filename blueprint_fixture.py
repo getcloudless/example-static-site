@@ -77,6 +77,4 @@ class BlueprintTest(BlueprintTestInterface):
                        setup_info.blueprint_vars["use_sslmate"])
         use_datadog = 'DATADOG_API_KEY' in os.environ
         expected_content = "Cloudless"
-        services = [{"public_ip": i.public_ip, "private_ip": i.private_ip}
-                    for s in service.subnetworks for i in s.instances]
-        check_health(services, expected_content, use_datadog, use_sslmate)
+        check_health(service, expected_content, use_datadog, use_sslmate)

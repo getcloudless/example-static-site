@@ -62,6 +62,32 @@ If you want to set up monitoring, you need to set `use_datadog` to true in your
 `vars.yml` file, and then set `DATADOG_API_KEY` and `DATADOG_APP_KEY` to the
 proper values on the Consul server that you provide in `consul_ips`.
 
+## Deploy Script/Python Helpers
+
+There's a python deploy script and python helpers that are partially tested by
+the regression test.  For example, to deploy "getcloudless.com" in the "cloudless"
+network with a "consul-1" consul service, run:
+
+```shell
+$ SERVICE_NAME="web-$(git rev-parse --short HEAD)"
+$ python helpers/deploy.py cloudless consul-1 "$SERVICE_NAME" \
+    getcloudless.com https://github.com/getcloudless/cloudless "Cloudless"
+```
+
+This will deploy the service and make sure that it returns "Cloudless" somewhere
+in the response.  You must also have all the datadog and sslmate configuration
+set as this script uses those environment variables.  Run with no args for
+usage details.
+
+There's also a python script at `helpers/update_dns.py` to update your dns if
+you use NS1.  Run with no args or `--help` for usage details.  This script isn't
+currently used by the regression tests.
+
+Finally, there's a python script at `helpers/setup_consul.py` to set the proper
+configuration on your consul server.  Run with no args or `--help` for usage
+details.  This script is used by the regression tests to configure the temporary
+consul server.
+
 ## Development
 
 The main value of the test framework is that it is focused on the workflow of

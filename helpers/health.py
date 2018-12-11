@@ -17,21 +17,21 @@ def print_and_raise(message):
     print("Error: %s" % message)
     raise Exception(message)
 
-def check_health(services, expected_content, use_datadog, use_sslmate):
+def check_health(service, expected_content, use_datadog, use_sslmate):
     """
     Check that a service is working properly, optionally with datadog and sslmate.
     """
-
+    instances = [i for s in service.subnetworks for i in s.instances]
     @retry(wait_fixed=10000, stop_max_attempt_number=24)
     def check_responsive():
-        for service in services:
+        for instance in instances:
             if use_sslmate:
                 # Don't verify the certificate so we can test using the sslmate sandbox
-                check_url = "https://%s" % service["public_ip"]
+                check_url = "https://%s" % instance.public_ip
                 print("Checking url: %s" % check_url)
                 response = requests.get(check_url, verify=False)
             else:
-                check_url = "http://%s" % service["public_ip"]
+                check_url = "http://%s" % instance.public_ip
                 print("Checking url: %s" % check_url)
                 response = requests.get(check_url)
             if not response.content:
@@ -63,7 +63,7 @@ def check_health(services, expected_content, use_datadog, use_sslmate):
         for event in events['events']:
             if check_event_match(event):
                 return True
-        print_and_raise("Could not find this service in datadog events!  %s" % events)
+        print_and_raise("Could not find this instance in datadog events!  %s" % events)
 
     @retry(wait_fixed=10000, stop_max_attempt_number=24)
     def is_agent_sending_metrics(query, query_type, private_ip):
@@ -75,8 +75,8 @@ def check_health(services, expected_content, use_datadog, use_sslmate):
                 return
             # Delete this because we don't care about it here and it muddies the error message
             del datapoint['pointlist']
-        print_and_raise("No %s stats in datadog metrics for this service!  %s" % (query_type,
-                                                                                  series))
+        print_and_raise("No %s stats in datadog metrics for this instance!  %s" % (query_type,
+                                                                                   series))
 
     check_responsive()
     if use_datadog:
@@ -87,12 +87,12 @@ def check_health(services, expected_content, use_datadog, use_sslmate):
 
         initialize(**options)
 
-        for service in services:
-            is_agent_reporting(service["private_ip"])
+        for instance in instances:
+            is_agent_reporting(instance.private_ip)
             is_agent_sending_metrics('nginx.net.connections{*}by{private_ip}', 'nginx',
-                                     service["private_ip"])
+                                     instance.private_ip)
             is_agent_sending_metrics('consul.catalog.total_nodes{*}by{private_ip}', 'consul',
-                                     service["private_ip"])
+                                     instance.private_ip)
 
 def main():
     """
