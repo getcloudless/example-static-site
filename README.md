@@ -47,6 +47,8 @@ By default, the tests assume the certificate is for `getcloudless.com` (which
 you can get by using the SSLMate sandbox).  If you want to test that your domain
 works, set the `STATIC_SITE_TEST_DOMAIN` environment variable.
 
+See `example-environment.sh` for how to set these.
+
 If you want to use SSL when you deploy, you need to set `use_sslmate` to true in
 your `vars.yml` file, and then set `SSLMATE_API_KEY`, `SSLMATE_API_ENDPOINT`,
 and `{your_domain}.key` to the proper values on the Consul server that you
@@ -61,6 +63,8 @@ If you want the regression test to test for this, you need to set
 `DATADOG_API_KEY` is the same one use use for the agent while the
 `DATADOG_APP_KEY` identifies the client (the machine running Cloudless) that's
 querying the DataDog API to test whether the service is logging.
+
+See `example-environment.sh` for how to set these.
 
 If you want to set up monitoring, you need to set `use_datadog` to true in your
 `vars.yml` file, and then set `DATADOG_API_KEY` and `DATADOG_APP_KEY` to the
