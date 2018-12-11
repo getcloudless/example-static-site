@@ -88,7 +88,7 @@ apt-get install -y datadog-agent
 cat <<EOF > /opt/sslmate_download.sh
 cd /etc/sslmate/
 export SSLMATE_CONFIG=/etc/sslmate.conf
-if sslmate download {{ jekyll_site_domain }}
+if sslmate download "{{ jekyll_site_domain }}"
 then
     service nginx restart
 fi
@@ -97,7 +97,7 @@ chmod a+x /opt/sslmate_download.sh
 {% endif %}
 
 # Configure Nginx
-cat <<EOF >| /etc/nginx/sites-available/getcloudless.com.conf
+cat <<EOF >| "/etc/nginx/sites-available/{{ jekyll_site_domain }}.conf"
 server {
 {% if use_sslmate %}
     listen 80 default_server;
@@ -111,8 +111,8 @@ server {
 server {
     listen 443 ssl default_server;
     listen [::]:443 ssl default_server;
-    ssl_certificate_key /etc/sslmate/getcloudless.com.key;
-    ssl_certificate /etc/sslmate/getcloudless.com.chained.crt;
+    ssl_certificate_key /etc/sslmate/{{ jekyll_site_domain }}.key;
+    ssl_certificate /etc/sslmate/{{ jekyll_site_domain }}.chained.crt;
 
     # Recommended security settings from https://wiki.mozilla.org/Security/Server_Side_TLS
     ssl_ciphers 'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';
@@ -139,14 +139,14 @@ server {
     }
 }
 EOF
-ln -s /etc/nginx/sites-available/getcloudless.com.conf \
-      /etc/nginx/sites-enabled/getcloudless.com.conf
+ln -s "/etc/nginx/sites-available/{{ jekyll_site_domain }}.conf" \
+      "/etc/nginx/sites-enabled/{{ jekyll_site_domain }}.conf"
 rm /etc/nginx/sites-enabled/default
 
 # Build Jekyll Site
 echo Cloning: "{{ jekyll_site_github_url }}"
-git clone "{{ jekyll_site_github_url }}"
-cd getcloudless.com/ || exit
+git clone "{{ jekyll_site_github_url }}" "{{ jekyll_site_domain }}"
+cd "{{ jekyll_site_domain }}" || exit
 bundle install
 bundle exec jekyll build --destination /var/www/html
 
