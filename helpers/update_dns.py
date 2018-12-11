@@ -12,14 +12,15 @@ API_KEY = os.environ["NSONE_CLOUDLESS_API_KEY"]
 @click.command()
 @click.argument("domain")
 @click.argument("ip_address")
+@click.option('--subdomain', default="aws", help='Subdomain to modify.')
 @click.option('--remove', is_flag=True, help='Remove IP rather than add.')
-def manage_dns(domain, ip_address, remove):
+def manage_dns(domain, ip_address, subdomain, remove):
     """Add or remove an IP to our DNS zone."""
     api = NS1(apiKey=API_KEY)
     zone = api.loadZone(domain)
-    record = zone.loadRecord("aws", "A")
+    record = zone.loadRecord(subdomain, "A")
     answers = [answer["answer"] for answer in record["answers"]]
-    print("Old IPs for record 'aws.%s': %s" % (domain, answers))
+    print("Old IPs for record '%s.%s': %s" % (subdomain, domain, answers))
     if remove:
         print("Removing IP: %s" % ip_address)
         answers = [answer for answer in answers
@@ -27,7 +28,7 @@ def manage_dns(domain, ip_address, remove):
     else:
         print("Adding IP: %s" % ip_address)
         answers.append([ip_address])
-    print("New IPs for record 'aws.%s': %s" % (domain, answers))
+    print("New IPs for record '%s.%s': %s" % (subdomain, domain, answers))
     record.update(answers=answers)
 
 if __name__ == '__main__':
