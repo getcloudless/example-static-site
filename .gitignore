@@ -1,3 +1,4 @@
 .cloudless
 Pipfile.lock
 example-environment.sh
+*.key
