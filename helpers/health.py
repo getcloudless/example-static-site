@@ -7,6 +7,7 @@ import time
 import requests
 from retrying import retry
 from datadog import initialize, api
+from collections import namedtuple
 
 def print_and_raise(message):
     """
@@ -102,6 +103,9 @@ def main():
         print(("Usage: %s <service_private_ip> <service_public_ip> <expected_content> "
                "<datadog|sslmate|both|none>") % sys.argv[0])
         sys.exit(1)
+    Service = namedtuple('Service', 'subnetworks')
+    Subnetwork = namedtuple('Subnetwork', 'instances')
+    Instance = namedtuple('Instance', 'private_ip public_ip')
     private_ip = sys.argv[1]
     public_ip = sys.argv[2]
     expected_content = sys.argv[3]
@@ -117,7 +121,7 @@ def main():
         use_sslmate = True
     elif mode != "none":
         raise Exception("Unrecognized mode argument: %s" % mode)
-    check_health([{"private_ip": private_ip, "public_ip": public_ip}], expected_content,
+    check_health(Service([Subnetwork([Instance(private_ip, public_ip)])]), expected_content,
                  use_datadog, use_sslmate)
 
 if __name__ == '__main__':
