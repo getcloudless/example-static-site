@@ -16,7 +16,7 @@ instance:
       device_name: /dev/sda1
 
 image:
-  name: "cloudless-example-base-image-v0"
+  name: "cloudless-example-base-image-v1"
 
 initialization:
   - path: "static_site_startup_script.sh"
