@@ -147,6 +147,10 @@ rm /etc/nginx/sites-enabled/default
 echo Cloning: "{{ jekyll_site_github_url }}"
 git clone "{{ jekyll_site_github_url }}" "{{ jekyll_site_domain }}"
 cd "{{ jekyll_site_domain }}" || exit
+
+# See https://bundler.io/blog/2019/01/04/an-update-on-the-bundler-2-release.html
+gem install bundler -v $(cat Gemfile.lock | grep -A 1 "BUNDLED WITH" | grep -v "BUNDLED WITH")
+
 bundle install
 bundle exec jekyll build --destination /var/www/html
 
